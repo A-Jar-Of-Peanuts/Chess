@@ -123,6 +123,8 @@ void drawBoard() {
     for (int c = 0; c < 8; c++) { 
       if (r == rselected && c == cselected) {
         fill(0, 255, 0);
+      } else if (rselected != -1 && cselected != -1 && pieces[grid[rselected][cselected]].act(r, c) && (grid[r][c]== -1 || grid[r][c]>15)) {
+        fill(0, 0, 255);
       } else if ( (r%2) == (c%2) ) { 
         fill(lightbrown);
       } else { 

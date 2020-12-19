@@ -6,11 +6,18 @@ PImage wrook, wbishop, wknight, wqueen, wking, wpawn;
 PImage brook, bbishop, bknight, bqueen, bking, bpawn;
 boolean firstClick, isTurn;
 int row1, col1, row2, col2;
+
+//what the last piece taken was
 int piecetaken = -1; 
 Server server; 
+
+//whether the last turn included a pawn promotion
 boolean pawnpromotion = false; 
+
+//coordinates of currently selected piece
 int rselected = -1;
 int cselected = -1;
+
 //Grid showing where all the pieces are. Numbers correspond to index of pieces + opieces. -1 indicates that there is no piece there. 
 int grid[][] = {
   {24, 25, 26, 27, 28, 29, 30, 31}, 
@@ -131,8 +138,13 @@ void draw() {
 void drawBoard() {
   for (int r = 0; r < 8; r++) {
     for (int c = 0; c < 8; c++) { 
+      //highlights selected piece in green
       if (r == rselected && c == cselected) {
         fill(0, 255, 0);
+      } 
+      //highlights possible moves in blue
+      else if (rselected != -1 && cselected != -1 && pieces[grid[rselected][cselected]].act(r, c)&& (grid[r][c]== -1 || grid[r][c]>15)) {
+        fill(0, 0, 255);
       } else if ( (r%2) == (c%2) ) { 
         fill(lightbrown);
       } else { 

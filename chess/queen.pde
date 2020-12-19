@@ -6,8 +6,42 @@ class Queen extends Chesspiece {
 
  public boolean act(int posx, int posy) {
     boolean blocked = false;
-    if (!(Math.abs(posx-this.posx) == Math.abs(posy-this.posy)) && (posx != this.posx && posy!= this.posy)) {
-      blocked = true;
+    if (!(Math.abs(posx-this.posx) == Math.abs(posy-this.posy))) {
+      if (posx != this.posx && posy!= this.posy) {
+        blocked = true;
+      } else if (posx == this.posx) {
+        if (posy > this.posy) {
+          for (int i = this.posy+1; i<posy; i++) {
+            if (grid[posx][i] != -1) {
+              blocked = true;
+              break;
+            }
+          }
+        } else if (posy < this.posy) {
+          for (int i = posy+1; i<this.posy; i++) {
+            if (grid[posx][i] != -1) {
+              blocked = true;
+              break;
+            }
+          }
+        }
+      } else if (posy == this.posy) {
+        if (posx> this.posx) {
+          for (int i = this.posx+1; i<posx; i++) {
+            if (grid[i][posy] != -1) {
+              blocked = true;
+              break;
+            }
+          }
+        } else if (posx < this.posx) {
+          for (int i = posx+1; i<this.posx; i++) {
+            if (grid[i][posy] != -1) {
+              blocked = true;
+              break;
+            }
+          }
+        }
+      }
     } else {
       if (posx < this.posx) {
         if (posy <this.posy) {
@@ -34,38 +68,6 @@ class Queen extends Chesspiece {
           for (int i = 1; i<Math.abs(posx-this.posx); i++) {
             if (grid[this.posx+i][this.posy+i] != -1) {
               blocked = true;
-            }
-          }
-        } else if (posx == this.posx) {
-          if (posy > this.posy) {
-            for (int i = this.posy+1; i<posy; i++) {
-              if (grid[posx][i] != -1) {
-                blocked = true;
-                break;
-              }
-            }
-          } else if (posy < this.posy) {
-            for (int i = posy+1; i<this.posy; i++) {
-              if (grid[posx][i] != -1) {
-                blocked = true;
-                break;
-              }
-            }
-          }
-        } else if (posy == this.posy) {
-          if (posx> this.posx) {
-            for (int i = this.posx+1; i<posx; i++) {
-              if (grid[i][posy] != -1) {
-                blocked = true;
-                break;
-              }
-            }
-          } else if (posx < this.posx) {
-            for (int i = posx+1; i<this.posx; i++) {
-              if (grid[i][posy] != -1) {
-                blocked = true;
-                break;
-              }
             }
           }
         }
