@@ -4,8 +4,28 @@ class King extends Chesspiece {
     piece = wking;
   }
 
-  public boolean act(int posx, int posy) {
-   return true;
+ public boolean act(int posx, int posy) {
+   if(posx == this.posx) {
+     if(posy == this.posy -1 || posy == this.posy +1) {
+       return true;
+     }
+   }
+   if(posy == this.posy) {
+     if(posx == this.posx -1 || posx == this.posx +1) {
+       return true;
+     }
+   }
+   if(posy == this.posy+1 || posy == this.posy-1) {
+     if(posx == this.posx-1 || posx == this.posx+1) {
+       return true;
+     }
+   }
+   if(posx == this.posx+1 || posx == this.posx-1) {
+     if(posy == this.posy-1 || posy == this.posy+1) {
+       return true;
+     }
+   }
+   return false;
   }
   public void show() {
     if(isO) {

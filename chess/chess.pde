@@ -9,7 +9,8 @@ int row1, col1, row2, col2;
 int piecetaken = -1; 
 Server server; 
 boolean pawnpromotion = false; 
-
+int rselected = -1;
+int cselected = -1;
 //Grid showing where all the pieces are. Numbers correspond to index of pieces + opieces. -1 indicates that there is no piece there. 
 int grid[][] = {
   {24, 25, 26, 27, 28, 29, 30, 31}, 
@@ -67,7 +68,6 @@ void draw() {
       int c1 = Integer.parseInt(temp[1]); 
       int r2 = Integer.parseInt(temp[2]); 
       int c2 = Integer.parseInt(temp[3]);
-      System.out.println(r1+" "+c1+" "+r2+" "+c2);
       piecetaken = grid[r2][c2]; 
       grid[r2][c2] = grid[r1][c1]; 
       grid[r1][c1] = -1; 
@@ -83,7 +83,6 @@ void draw() {
       int c1 = Integer.parseInt(temp[1]); 
       int r2 = Integer.parseInt(temp[2]); 
       int c2 = Integer.parseInt(temp[3]);
-      System.out.println(r1+" "+c1+" "+r2+" "+c2);
       grid[r2][c2] = grid[r1][c1]; 
       grid[r1][c1] = piecetaken; 
       opieces[grid[r2][c2]-16].posx = r2;
@@ -99,7 +98,6 @@ void draw() {
       int c1 = Integer.parseInt(temp[1]); 
       int r2 = Integer.parseInt(temp[2]); 
       int c2 = Integer.parseInt(temp[3]);
-      System.out.println(r1+" "+c1+" "+r2+" "+c2);
       grid[r2][c2] = grid[r1][c1]; 
       grid[r1][c1] = piecetaken; 
       opieces[grid[r2][c2]-16] = new Pawn(r2, c2);     
@@ -133,7 +131,9 @@ void draw() {
 void drawBoard() {
   for (int r = 0; r < 8; r++) {
     for (int c = 0; c < 8; c++) { 
-      if ( (r%2) == (c%2) ) { 
+      if (r == rselected && c == cselected) {
+        fill(0, 255, 0);
+      } else if ( (r%2) == (c%2) ) { 
         fill(lightbrown);
       } else { 
         fill(darkbrown);
@@ -160,17 +160,30 @@ void mouseReleased() {
     if (firstClick) {
       row1 = mouseY/100;
       col1 = mouseX/100;
+
       if (grid[row1][col1]!=-1 && grid[row1][col1]<16) {
+        rselected = row1;
+        cselected = col1;
         firstClick = false;
-        System.out.println("select");
       }
     } else {
       row2 = mouseY/100;
       col2 = mouseX/100;
-      //checking if it is a valid move (not on itself/one of your pieces)
-      if (!(row2 == row1 && col2 == col1) && (grid[row2][col2] == -1 || grid[row2][col2]>15) && pieces[grid[row1][col1]].act(row2, col2)) {
-        System.out.println("move"); 
 
+      if (row2 == row1 && col2 == col1) {
+        rselected = -1;
+        cselected = -1;
+        firstClick = true;
+      } else if (grid[row2][col2]<=15 && grid[row2][col2] != -1) {
+        row1 = row2;
+        col1 = col2;
+        rselected = row1;
+        cselected = col1;
+      }     
+      //checking if it is a valid move (not on itself/one of your pieces)
+      else if (pieces[grid[row1][col1]].act(row2, col2)) {
+        rselected = -1;
+        cselected = -1;
         piecetaken = grid[row2][col2]; 
 
         grid[row2][col2] = grid[row1][col1];
@@ -183,7 +196,6 @@ void mouseReleased() {
           firstClick = true;
           isTurn = false; 
           surface.setTitle("White - Opponent's Turn"); 
-          System.out.println(row1+" "+col1+" "+row2+" "+col2);
           server.write(row1+" "+col1+" "+row2+" "+col2+" p");
         } 
         //Move does not cause a pawn promotion
@@ -195,7 +207,6 @@ void mouseReleased() {
           firstClick = true;
           isTurn = false; 
           surface.setTitle("White - Opponent's Turn");
-          System.out.println(row1+" "+col1+" "+row2+" "+col2);
           server.write(row1+" "+col1+" "+row2+" "+col2);
         }
       }

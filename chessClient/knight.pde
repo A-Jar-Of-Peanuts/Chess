@@ -4,9 +4,8 @@ class Knight extends Chesspiece {
     piece = wknight;
   }
 
-  public void act(int posx, int posy) {
-    this.posx = posx; 
-    this.posy = posy;
+  public boolean act(int posx, int posy) {
+   return true;
   }
   public void show() {
     if(isO) {

@@ -10,7 +10,6 @@ abstract class Chesspiece {
 
   public void show() {
   }
-
-  public void act(int posx, int posy) {
-  }
+  
+  abstract public boolean act(int posx, int posy);
 }

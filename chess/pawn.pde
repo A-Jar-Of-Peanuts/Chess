@@ -5,14 +5,14 @@ class Pawn extends Chesspiece {
   }
 
   public boolean act(int posx, int posy) {
-    if (posy == this.posy && posx == this.posx + 1) {
-      System.out.println("moving pawn");
-     return true;
+    if (posy == this.posy && posx == this.posx - 1 && grid[posx][posy] == -1) {
+      return true;
+    } else if (posx == this.posx-1 && (posy == this.posy-1 || posy == this.posy+1) && grid[posx][posy] !=-1) {
+      return true;
     }
     return false;
   }
   public void show() {
-    //System.out.println("HI"); 
     if (isO) {
       image(bpawn, posy*100, posx*100, 100, 100);
     } else

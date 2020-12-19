@@ -9,16 +9,8 @@ int row1, col1, row2, col2;
 int piecetaken = -1;
 Client client; 
 boolean pawnpromotion = false; 
-//char grid[][] = {
-//  {'R', 'B', 'N', 'Q', 'K', 'N', 'B', 'R'}, 
-//  {'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'}, 
-//  {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '}, 
-//  {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '}, 
-//  {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '}, 
-//  {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '}, 
-//  {'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'}, 
-//  {'r', 'b', 'n', 'q', 'k', 'n', 'b', 'r'}
-//};
+int rselected = -1;
+int cselected = -1;
 
 int grid[][] = { 
   {8, 9, 10, 11, 12, 13, 14, 15}, 
@@ -76,7 +68,6 @@ void draw() {
       piecetaken = grid[r2][c2]; 
       grid[r2][c2] = grid[r1][c1]; 
       grid[r1][c1] = -1; 
-      //grid[r2][c2] = p;
       opieces[grid[r2][c2]-16] = new Queen(r2, c2); 
       opieces[grid[r2][c2]-16].isO = true; 
       isTurn = true;
@@ -89,7 +80,6 @@ void draw() {
       System.out.println(r1+" "+c1+" "+r2+" "+c2);
       grid[r2][c2] = grid[r1][c1]; 
       grid[r1][c1] = piecetaken; 
-      //grid[r2][c2] = p;
       opieces[grid[r2][c2]-16].posx = r2;
       opieces[grid[r2][c2]-16].posy = c2; 
       isTurn = false;
@@ -103,7 +93,6 @@ void draw() {
       System.out.println(r1+" "+c1+" "+r2+" "+c2);
       grid[r2][c2] = grid[r1][c1]; 
       grid[r1][c1] = piecetaken; 
-      //grid[r2][c2] = p;
       opieces[grid[r2][c2]-16] = new Pawn(r2, c2);
       opieces[grid[r2][c2]-16].isO = true; 
       isTurn = false;
@@ -118,7 +107,6 @@ void draw() {
       piecetaken = grid[r2][c2]; 
       grid[r2][c2] = grid[r1][c1]; 
       grid[r1][c1] = -1; 
-      //grid[r2][c2] = p;
       opieces[grid[r2][c2]-16].posx = r2;
       opieces[grid[r2][c2]-16].posy = c2; 
       isTurn = true;
@@ -133,7 +121,9 @@ void draw() {
 void drawBoard() {
   for (int r = 0; r < 8; r++) {
     for (int c = 0; c < 8; c++) { 
-      if ( (r%2) == (c%2) ) { 
+      if (r == rselected && c == cselected) {
+        fill(0, 255, 0);
+      } else if ( (r%2) == (c%2) ) { 
         fill(lightbrown);
       } else { 
         fill(darkbrown);
@@ -146,18 +136,6 @@ void drawBoard() {
 void drawPieces() {
   for (int r = 0; r < 8; r++) {
     for (int c = 0; c < 8; c++) {
-      //if (grid[r][c] == 'r') image (wrook, c*100, r*100, 100, 100);
-      //if (grid[r][c] == 'R') image (brook, c*100, r*100, 100, 100);
-      //if (grid[r][c] == 'b') image (wbishop, c*100, r*100, 100, 100);
-      //if (grid[r][c] == 'B') image (bbishop, c*100, r*100, 100, 100);
-      //if (grid[r][c] == 'n') image (wknight, c*100, r*100, 100, 100);
-      //if (grid[r][c] == 'N') image (bknight, c*100, r*100, 100, 100);
-      //if (grid[r][c] == 'q') image (wqueen, c*100, r*100, 100, 100);
-      //if (grid[r][c] == 'Q') image (bqueen, c*100, r*100, 100, 100);
-      //if (grid[r][c] == 'k') image (wking, c*100, r*100, 100, 100);
-      //if (grid[r][c] == 'K') image (bking, c*100, r*100, 100, 100);
-      //if (grid[r][c] == 'p') image (wpawn, c*100, r*100, 100, 100);
-      //if (grid[r][c] == 'P') image (bpawn, c*100, r*100, 100, 100);
       if (grid[r][c] != -1 && grid[r][c]<16) {
         pieces[grid[r][c]].show();
       } else if (grid[r][c] >=16) {
@@ -172,15 +150,30 @@ void mouseReleased() {
     if (firstClick) {
       row1 = mouseY/100;
       col1 = mouseX/100;
+
       if (grid[row1][col1]!=-1 && grid[row1][col1]<16) {
+        rselected = row1;
+        cselected = col1;
         firstClick = false;
         System.out.println("select");
       }
     } else {
       row2 = mouseY/100;
       col2 = mouseX/100;
-      if (!(row2 == row1 && col2 == col1) && (grid[row2][col2] == -1 || grid[row2][col2]>15)) {
+
+      if (row2 == row1 && col2 == col1) {
+        rselected = -1;
+        cselected = -1;
+        firstClick = true;
+      } else if (grid[row2][col2]<=15 && grid[row2][col2] != -1) {
+        row1 = row2;
+        col1 = col2;
+        rselected = row1;
+        cselected = col1;
+      } else if (pieces[grid[row1][col1]].act(row2, col2)) {
         System.out.println("move"); 
+        rselected = -1;
+        cselected = -1;
         piecetaken = grid[row2][col2]; 
         grid[row2][col2] = grid[row1][col1];
         grid[row1][col1] = -1;

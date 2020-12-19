@@ -9,6 +9,7 @@ abstract class Chesspiece {
 
   public void show() {
   }
-
+  
+  //checks if move is valid
   abstract public boolean act(int posx, int posy);
 }

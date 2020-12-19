@@ -4,10 +4,16 @@ class Pawn extends Chesspiece {
     piece = wpawn;
   }
 
-  public void act(int posx, int posy) {
-    this.posx = posx; 
-    this.posy = posy;
+   public boolean act(int posx, int posy) {
+    if (posy == this.posy && posx == this.posx + 1 && grid[posx][posy] == -1) {
+      //System.out.println("moving pawn");
+      return true;
+    } else if (posx == this.posx+1 && (posy == this.posy-1 || posy == this.posy+1) && grid[posx][posy] !=-1) {
+      return true;
+    }
+    return false;
   }
+  
   public void show() {
     //System.out.println("HI"); 
     if(isO) {
