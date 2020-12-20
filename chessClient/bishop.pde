@@ -6,6 +6,11 @@ class Bishop extends Chesspiece {
   }
 
   public boolean act(int posx, int posy) {
+    if(!isO) {
+      if(((King)pieces[12]).inCheck(this.posx, this.posy, posx, posy)) {
+        return false;
+      }
+    }
     boolean blocked = false;
     if (!(Math.abs(posx-this.posx) == Math.abs(posy-this.posy))) {
       blocked = true;

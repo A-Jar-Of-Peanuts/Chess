@@ -1,4 +1,7 @@
 import processing.net.*; 
+import java.util.*;
+import javax.swing.*;
+import java.awt.Image;
 
 color lightbrown = #FFFFC3;
 color darkbrown  = #D8864E;
@@ -13,6 +16,7 @@ Server server;
 
 //whether the last turn included a pawn promotion
 boolean pawnpromotion = false; 
+boolean incheck = false;
 
 //coordinates of currently selected piece
 int rselected = -1;
@@ -69,8 +73,8 @@ void draw() {
   if (c != null) {
     String[] temp = c.readString().split(" "); 
 
-    //An opponent pawn has moved to the other side. Pawn promotion
-    if (temp.length == 5 && temp[4].equals("p")) {
+    //An opponent pawn has moved to the other side. Pawn promotion to queen
+    if (temp.length == 5 && temp[4].equals("q")) {
       int r1 = Integer.parseInt(temp[0]); 
       int c1 = Integer.parseInt(temp[1]); 
       int r2 = Integer.parseInt(temp[2]); 
@@ -82,6 +86,71 @@ void draw() {
       opieces[grid[r2][c2]-16].isO = true; 
       isTurn = true;
       surface.setTitle("White - Your Turn");
+      if (((King)pieces[12]).inCheck()) {
+        incheck = true;
+      } else {
+        incheck = false;
+      }
+    } 
+
+    //An opponent pawn has moved to the other side. Pawn promotion to knight
+    else if (temp.length == 5 && temp[4].equals("k")) {
+      int r1 = Integer.parseInt(temp[0]); 
+      int c1 = Integer.parseInt(temp[1]); 
+      int r2 = Integer.parseInt(temp[2]); 
+      int c2 = Integer.parseInt(temp[3]);
+      piecetaken = grid[r2][c2]; 
+      grid[r2][c2] = grid[r1][c1]; 
+      grid[r1][c1] = -1; 
+      opieces[grid[r2][c2]-16] = new Knight(r2, c2); 
+      opieces[grid[r2][c2]-16].isO = true; 
+      isTurn = true;
+      surface.setTitle("White - Your Turn");
+      if (((King)pieces[12]).inCheck()) {
+        incheck = true;
+      } else {
+        incheck = false;
+      }
+    } 
+
+    //An opponent pawn has moved to the other side. Pawn promotion to rook
+    else if (temp.length == 5 && temp[4].equals("r")) {
+      int r1 = Integer.parseInt(temp[0]); 
+      int c1 = Integer.parseInt(temp[1]); 
+      int r2 = Integer.parseInt(temp[2]); 
+      int c2 = Integer.parseInt(temp[3]);
+      piecetaken = grid[r2][c2]; 
+      grid[r2][c2] = grid[r1][c1]; 
+      grid[r1][c1] = -1; 
+      opieces[grid[r2][c2]-16] = new Rook(r2, c2); 
+      opieces[grid[r2][c2]-16].isO = true; 
+      isTurn = true;
+      surface.setTitle("White - Your Turn");
+      if (((King)pieces[12]).inCheck()) {
+        incheck = true;
+      } else {
+        incheck = false;
+      }
+    } 
+
+    //An opponent pawn has moved to the other side. Pawn promotion to bishop
+    else if (temp.length == 5 && temp[4].equals("b")) {
+      int r1 = Integer.parseInt(temp[0]); 
+      int c1 = Integer.parseInt(temp[1]); 
+      int r2 = Integer.parseInt(temp[2]); 
+      int c2 = Integer.parseInt(temp[3]);
+      piecetaken = grid[r2][c2]; 
+      grid[r2][c2] = grid[r1][c1]; 
+      grid[r1][c1] = -1; 
+      opieces[grid[r2][c2]-16] = new Bishop(r2, c2); 
+      opieces[grid[r2][c2]-16].isO = true; 
+      isTurn = true;
+      surface.setTitle("White - Your Turn");
+      if (((King)pieces[12]).inCheck()) {
+        incheck = true;
+      } else {
+        incheck = false;
+      }
     } 
 
     //The opponent has pressed the undo key. No pawn promotion to undo
@@ -97,6 +166,11 @@ void draw() {
       isTurn = false;
       firstClick = true;
       surface.setTitle("White - Opponent's Turn");
+      if (((King)pieces[12]).inCheck()) {
+        incheck = true;
+      } else {
+        incheck = false;
+      }
     } 
 
     //The opponent has pressed the undo key. Need to undo the pawn promotion too. 
@@ -112,6 +186,11 @@ void draw() {
       isTurn = false;
       firstClick = true;
       surface.setTitle("White - Opponent's Turn");
+      if (((King)pieces[12]).inCheck()) {
+        incheck = true;
+      } else {
+        incheck = false;
+      }
     }
 
     //A regular move by the opponent
@@ -128,6 +207,11 @@ void draw() {
       opieces[grid[r2][c2]-16].posy = c2; 
       isTurn = true;
       surface.setTitle("White - Your Turn");
+      if (((King)pieces[12]).inCheck()) {
+        incheck = true;
+      } else {
+        incheck = false;
+      }
     }
   }
 
@@ -145,6 +229,10 @@ void drawBoard() {
       //highlights possible moves in blue
       else if (rselected != -1 && cselected != -1 && pieces[grid[rselected][cselected]].act(r, c)&& (grid[r][c]== -1 || grid[r][c]>15)) {
         fill(0, 0, 255);
+      } 
+      //highlights king in red if in check
+      else if (incheck && grid[r][c] == 12) {
+        fill(255, 0, 0);
       } else if ( (r%2) == (c%2) ) { 
         fill(lightbrown);
       } else { 
@@ -204,11 +292,39 @@ void mouseReleased() {
         //Move causes a pawn promotion
         if (row2 == 0 && pieces[grid[row2][col2]] instanceof Pawn) {
           pawnpromotion = true;
-          pieces[grid[row2][col2]] = new Queen(row2, col2);
-          firstClick = true;
-          isTurn = false; 
-          surface.setTitle("White - Opponent's Turn"); 
-          server.write(row1+" "+col1+" "+row2+" "+col2+" p");
+          ImageIcon img = new ImageIcon("whitePawn.png");
+          String[] choose = {"queen", "rook", "bishop", "knight"};
+          String s = (String) JOptionPane.showInputDialog(frame, "Choose your piece", "Pawn Promotion", JOptionPane.PLAIN_MESSAGE, img, choose, "queen");
+          switch(s) {
+          case "queen":
+            pieces[grid[row2][col2]] = new Queen(row2, col2);
+            firstClick = true;
+            isTurn = false; 
+            surface.setTitle("White - Opponent's Turn"); 
+            server.write(row1+" "+col1+" "+row2+" "+col2+" q");
+            break;
+          case "rook":
+            pieces[grid[row2][col2]] = new Rook(row2, col2);
+            firstClick = true;
+            isTurn = false; 
+            surface.setTitle("White - Opponent's Turn"); 
+            server.write(row1+" "+col1+" "+row2+" "+col2+" r");
+            break;
+          case "bishop":
+            pieces[grid[row2][col2]] = new Bishop(row2, col2);
+            firstClick = true;
+            isTurn = false; 
+            surface.setTitle("White - Opponent's Turn"); 
+            server.write(row1+" "+col1+" "+row2+" "+col2+" b");
+            break;
+          case "knight":
+            pieces[grid[row2][col2]] = new Knight(row2, col2);
+            firstClick = true;
+            isTurn = false; 
+            surface.setTitle("White - Opponent's Turn"); 
+            server.write(row1+" "+col1+" "+row2+" "+col2+" k");
+            break;
+          }
         } 
         //Move does not cause a pawn promotion
         else {

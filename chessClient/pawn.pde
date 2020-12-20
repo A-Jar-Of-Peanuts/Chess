@@ -5,6 +5,11 @@ class Pawn extends Chesspiece {
   }
 
    public boolean act(int posx, int posy) {
+     if(!isO) {
+      if(((King)pieces[12]).inCheck(this.posx, this.posy, posx, posy)) {
+        return false;
+      }
+    }
     if (posy == this.posy && posx == this.posx + 1 && grid[posx][posy] == -1) {
       //System.out.println("moving pawn");
       return true;
